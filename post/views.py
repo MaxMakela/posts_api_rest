@@ -20,7 +20,7 @@ class PostView(APIView):
 
     def put(self, request, pk):
         saved_post = get_object_or_404(Post.objects.all(), pk=pk)
-        data = request.data.get('article')
+        data = request.data.get('post')
         serializer = PostSerializer(instance=saved_post, data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             post_saved = serializer.save()
