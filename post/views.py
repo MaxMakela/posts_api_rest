@@ -38,6 +38,16 @@ class PostView(APIView):
         }, status=204)
 
 
+class Like(APIView):
+    def post(self, request, pk):
+        post = get_object_or_404(Post.objects.all(), pk=pk)
+        if post.likes.filter(id=pk):
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+        return Response({"success": "Post '{}' was liked by user '{}'".format(post.title, request.user.id)})
+
+
 class UserCreate(CreateAPIView):
     authentication_classes = ()
     permission_classes = ()
@@ -51,7 +61,7 @@ class LoginView(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         user = authenticate(username=username, password=password)
-        token = Token.objects.create(user=user)
+        token, created = Token.objects.get_or_create(user=user)
         if user:
             return Response({"token": token.key})
         else:
